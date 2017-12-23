@@ -12,7 +12,7 @@ const INCORRECT_LOGIN_DETAILS_ERROR = 1;
 
 // TODO: Add more parameters your app needs during registration.
 router.get('/register/:email/:password/:name', function (req, res) {
-    userSchema.find({email: req.params.email}, function (err, user) {
+    userSchema.findOne({email: req.params.email}, function (err, user) {
         if (!user) {
             createAccount();
         } else {
@@ -38,17 +38,17 @@ router.get('/register/:email/:password/:name', function (req, res) {
 });
 
 router.get('/login/:email/:password', function (req, res) {
-    userSchema.find({email: req.params.email}, function (err, user) {
+    userSchema.findOne({email: req.params.email}, function (err, user) {
         if (user) {
-            logUserIn();
+            logUserIn(user);
         } else {
             res.json({error: INCORRECT_LOGIN_DETAILS_ERROR});
         }
     });
 
-    function logUserIn() {
-        bcrypt.compare(req.params.password, user.password, function (err, res) {
-            if (res == true) {
+    function logUserIn(user) {
+        bcrypt.compare(req.params.password, user.password, function (err, comparisonRes) {
+            if (comparisonRes == true) {
                 res.json(loginResponse(user))
             } else {
                 res.json({error: INCORRECT_LOGIN_DETAILS_ERROR})
